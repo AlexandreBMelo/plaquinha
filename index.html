@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffe34c">
+  <meta name="description" content="Escreva, vire o celular e mostre sua Plaquinha na festa.">
+  <title>Plaquinha</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #201c28; background: #ffe34c; }
+    body { margin: 0; min-height: 100vh; min-height: 100dvh; }
+    button, textarea { font: inherit; }
+    button { cursor: pointer; border: 2px solid #201c28; border-radius: 16px; min-height: 48px; font-weight: 800; transition: transform .15s, background .15s; }
+    button:hover { transform: translateY(-2px); }
+    button:active { transform: translateY(1px); }
+    :focus-visible { outline: 3px solid #006568; outline-offset: 4px; }
+    [hidden] { display: none !important; }
+    .editor { min-height: 100vh; min-height: 100dvh; padding: 32px 24px 20px; display: flex; flex-direction: column; align-items: center; }
+    main { width: min(100%, 480px); margin: auto; padding: 28px 0; }
+    .brand { display: inline-block; padding: 8px 15px; background: #ff80ab; border: 2px solid; border-radius: 12px; font-size: 18px; font-weight: 900; transform: rotate(-3deg); }
+    h1 { font-size: clamp(38px, 9vw, 54px); line-height: 1.05; letter-spacing: -2px; margin: 28px 0 12px; }
+    .intro { margin: 0 0 28px; font-size: 17px; line-height: 1.5; }
+    label { display: block; font-weight: 750; margin-bottom: 10px; }
+    textarea { width: 100%; min-height: 136px; padding: 16px; resize: vertical; border: 2px solid #201c28; border-radius: 16px; background: #fffdf5; color: #201c28; font-size: 22px; line-height: 1.3; }
+    .meta { display: flex; justify-content: space-between; gap: 12px; margin: 8px 0 20px; font-size: 13px; }
+    fieldset { border: 0; padding: 0; margin: 0 0 24px; }
+    legend { font-weight: 750; margin-bottom: 12px; }
+    .colors { display: flex; gap: 12px; }
+    .swatch { width: 48px; height: 48px; border-radius: 50%; position: relative; }
+    .swatch[aria-pressed="true"]::after { content: '✓'; position: absolute; inset: 0; display: grid; place-items: center; font-size: 25px; color: #201c28; }
+    .show { width: 100%; background: #201c28; color: white; padding: 16px; font-size: 20px; }
+    footer { padding: 18px 0 0; font-size: 12px; text-align: center; }
+    .display { position: fixed; inset: 0; background: var(--board, #ffe34c); color: #201c28; padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); display: flex; flex-direction: column; }
+    .toolbar { display: flex; justify-content: space-between; gap: 12px; flex-shrink: 0; }
+    .toolbar button { background: rgba(255,255,255,.65); padding: 10px 16px; font-size: 14px; }
+    .text-area { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; margin: 12px 0; }
+    .big-text { width: 100%; text-align: center; font-weight: 900; line-height: 1.08; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .display-note { text-align: center; font-size: 11px; margin: 0; flex-shrink: 0; }
+    @media (max-width: 360px) { .editor { padding-inline: 18px; } .colors { gap: 10px; } }
+    @media (prefers-reduced-motion: reduce) { button { transition: none; } }
+  </style>
+</head>
+<body>
+  <div class="editor" id="editor">
+    <main>
+      <span class="brand">Plaquinha</span>
+      <h1>Sua mensagem.<br>Bem grandona.</h1>
+      <p class="intro">Escreva, vire o celular e mostre pra galera!</p>
+      <form id="form">
+        <label for="message">O que vai na sua plaquinha?</label>
+        <textarea id="message" maxlength="200" placeholder="Toca a minha música!" required aria-describedby="hint counter"></textarea>
+        <div class="meta"><span id="hint">Vale recado, pedido e declaração.</span><span id="counter">0/200</span></div>
+        <fieldset>
+          <legend>Escolha sua cor</legend>
+          <div class="colors">
+            <button type="button" class="swatch" style="background:#ffe34c" data-color="#ffe34c" aria-label="Amarelo" aria-pressed="true"></button>
+            <button type="button" class="swatch" style="background:#ff80ab" data-color="#ff80ab" aria-label="Rosa" aria-pressed="false"></button>
+            <button type="button" class="swatch" style="background:#58dfcf" data-color="#58dfcf" aria-label="Verde água" aria-pressed="false"></button>
+            <button type="button" class="swatch" style="background:#85caff" data-color="#85caff" aria-label="Azul" aria-pressed="false"></button>
+            <button type="button" class="swatch" style="background:#fffdf5" data-color="#fffdf5" aria-label="Branco" aria-pressed="false"></button>
+          </div>
+        </fieldset>
+        <button class="show" type="submit">Mostrar →</button>
+      </form>
+    </main>
+    <footer>Desenvolvido por Alexandre Melo</footer>
+  </div>
+  <section class="display" id="display" aria-label="Sua plaquinha" hidden>
+    <div class="toolbar"><button type="button" id="edit">← Editar</button><button type="button" id="fullscreen">Tela cheia</button></div>
+    <div class="text-area" id="textArea"><div class="big-text" id="bigText" role="status"></div></div>
+    <p class="display-note" id="displayNote">Vire o celular para deixar sua mensagem ainda maior.</p>
+  </section>
+  <script>
+    const editor = document.getElementById('editor');
+    const display = document.getElementById('display');
+    const message = document.getElementById('message');
+    const bigText = document.getElementById('bigText');
+    const textArea = document.getElementById('textArea');
+    const fullscreen = document.getElementById('fullscreen');
+    const note = document.getElementById('displayNote');
+    let color = '#ffe34c';
+    let frame;
+
+    // Measure the actual rendered text so it fits in either phone orientation.
+    function fitText() {
+      if (display.hidden || !textArea.clientHeight) return;
+      let low = 1, high = Math.min(1600, textArea.clientHeight * 1.5);
+      for (let i = 0; i < 16; i++) {
+        const size = (low + high) / 2;
+        bigText.style.fontSize = size + 'px';
+        if (bigText.scrollHeight <= textArea.clientHeight - 2 && bigText.scrollWidth <= textArea.clientWidth) low = size;
+        else high = size;
+      }
+      bigText.style.fontSize = low + 'px';
+    }
+    function scheduleFit() { cancelAnimationFrame(frame); frame = requestAnimationFrame(fitText); }
+    async function enterFullscreen() {
+      if (!document.fullscreenEnabled || document.fullscreenElement) return;
+      try { await display.requestFullscreen(); }
+      catch { note.textContent = 'Tela cheia indisponível. Sua plaquinha continua funcionando aqui.'; }
+      scheduleFit();
+    }
+    message.addEventListener('input', () => {
+      message.setCustomValidity('');
+      document.getElementById('counter').textContent = message.value.length + '/200';
+    });
+    document.querySelectorAll('.swatch').forEach(button => {
+      button.addEventListener('click', () => {
+        color = button.dataset.color;
+        document.querySelectorAll('.swatch').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+      });
+    });
+    document.getElementById('form').addEventListener('submit', event => {
+      event.preventDefault();
+      const text = message.value.trim();
+      if (!text) { message.setCustomValidity('Escreva uma mensagem para mostrar.'); message.reportValidity(); return; }
+      message.blur();
+      bigText.textContent = text;
+      display.style.setProperty('--board', color);
+      editor.hidden = true;
+      display.hidden = false;
+      note.textContent = 'Vire o celular para deixar sua mensagem ainda maior.';
+      fullscreen.hidden = !document.fullscreenEnabled;
+      document.getElementById('edit').focus({ preventScroll: true });
+      scheduleFit();
+      enterFullscreen();
+    });
+    document.getElementById('edit').addEventListener('click', async () => {
+      if (document.fullscreenElement) { try { await document.exitFullscreen(); } catch {} }
+      display.hidden = true;
+      editor.hidden = false;
+      message.focus();
+    });
+    fullscreen.addEventListener('click', async () => {
+      if (document.fullscreenElement) { try { await document.exitFullscreen(); } catch {} }
+      else await enterFullscreen();
+    });
+    document.addEventListener('fullscreenchange', () => {
+      fullscreen.textContent = document.fullscreenElement ? 'Sair da tela cheia' : 'Tela cheia';
+      scheduleFit();
+    });
+    window.addEventListener('resize', scheduleFit);
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', scheduleFit);
+    if ('ResizeObserver' in window) new ResizeObserver(scheduleFit).observe(textArea);
+  </script>
+</body>
+</html>
+
